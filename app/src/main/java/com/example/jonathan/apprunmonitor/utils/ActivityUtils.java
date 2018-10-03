@@ -6,10 +6,10 @@ import android.util.Log;
 
 import java.util.List;
 
-import static com.example.jonathan.apprunmonitor.utils.ConstantsUtils.APP_TAG;
+import static com.example.jonathan.apprunmonitor.utils.ConstUtils.APP_TAG;
 
-public class ActivityManagerUtils {
-  private static final String TAG = APP_TAG + ActivityManagerUtils.class.getSimpleName();
+public class ActivityUtils {
+  private static final String TAG = APP_TAG + ActivityUtils.class.getSimpleName();
 
   public static boolean getAppRunningStatus(final Context context, final String packageName) {
     Log.d(TAG, "getAppRunningStatus: packageName=[" + packageName + "]");
@@ -37,6 +37,36 @@ public class ActivityManagerUtils {
     }
 
     Log.v(TAG, "getAppRunningStatus: isAppRunning=[" + isAppRunning + "]");
+
+    return isAppRunning;
+  }
+
+  public static boolean checkAppRunningPeriodically(final Context context, final long sleepMillis,
+                                                    final int maxTrials, final String targetPackage) {
+    Log.d(TAG, "checkAppRunningPeriodically: sleepMillis=[" + sleepMillis + "], maxTrials=[" + maxTrials +
+        "], targetPackage=[" + targetPackage + "]");
+
+    boolean isAppRunning = false;
+
+    int count = 0;
+
+    while (count < maxTrials) {
+      count++;
+
+      isAppRunning = getAppRunningStatus(context, targetPackage);
+
+      Log.v(TAG, "checkAppRunningPeriodically: isAppRunning=[" + isAppRunning + "], count=[" + count + "]");
+
+      if (isAppRunning) {
+        break;
+      }
+
+      try {
+        Thread.sleep(sleepMillis);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
 
     return isAppRunning;
   }
